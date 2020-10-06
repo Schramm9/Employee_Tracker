@@ -5,7 +5,7 @@ class Company {
   }
   findAllEmployees() {
     return this.connection.query(
-      "SELECT employee.id, employee.first_name, employee.last_name FROM employee;"
+      "SELECT employee.id, employee.first_name, employee.last_name, employee.manager_id FROM employee;"
     );
   }
   findAllDepts() {
@@ -19,14 +19,9 @@ class Company {
       deptId
     );
   }
-  findAllManagers() {
-    return this.connection.query(
-      "SELECT id, department.dept_name FROM department;"
-    );
-  }
   findAllEmployeesByManager(deptId) {
     return this.connection.query(
-      "SELECT employee.first_name, employee.last_name, employee.role_id FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on department.id = role.department_id WHERE department.id = ?;",
+      "SELECT employee.first_name, employee.last_name, employee.role_id F ROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on department.id = role.department_id WHERE department.id = ?;",
       deptId
     );
   }

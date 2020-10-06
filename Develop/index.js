@@ -1,4 +1,4 @@
-const { prompt } = require("inquirer"); //destructure inquirer.prompt
+const { prompt } = require("inquirer"); // destructure inquirer.prompt
 const db = require("../Master/db/db.js");
 const cTable = require("console.table");
 const connection = require("../Master/db/connection.js");
@@ -36,19 +36,19 @@ async function mainPrompt() {
   );
   switch (mainMenu) {
     case "View All Employees":
-      viewAllEmployees();
+      viewAllEmployees(); // Needs to show all fields like the gif
       break;
     case "View All Employees by department":
       viewAllEmployeesByDept();
       break;
     case "View All Employees by manager":
-      viewAllEmployeesByManager();
-      break;
-    case "Add Employee": // id added on its own
+      viewAllEmployeesByManager(); // Needs work- can it be recalibrated to throw an err. ?
+      break; //
+    case "Add Employee": // id added on its own i.e. auto_increment
       addEmployee();
       break;
     case "Remove Employee":
-      removeEmployee();
+      removeEmployee(); // working
       break;
     case "Update Employee Role":
       updateEmployeeRole();
@@ -56,22 +56,26 @@ async function mainPrompt() {
     case "Add Employee Role":
       addEmployeeRole();
       break;
+    case "Add department":
+      addDepartment();
+      break;
     case "Remove Employee Role":
-      removeEmployeeRole();
+      removeEmployeeRole(); // Needs to be started
       break;
     case "Update Employee Manager":
-      updateEmployeeManager();
+      updateEmployeeManager(); // Needs to be started
       break;
     case "View All Roles":
-      viewAllRoles();
+      viewAllRoles(); // Needs to be started
       break;
     default:
       process.exit();
   }
 }
 
-// all functions are async functions save for init()
+// all functions are async functions with the exception of init()
 // make such that db is an object of methods
+
 async function viewAllEmployees() {
   const employees = await db.findAllEmployees();
   console.log("-".repeat(30)); // repeating 30 dashes
@@ -102,11 +106,22 @@ async function viewAllEmployeesByDept() {
   mainPrompt(); // return to main prompt
 }
 async function viewAllEmployeesByManager() {
-  const managers = await db.findAllManagers();
-  const managerChoices = managers.map(({ id, managerName }) => ({
-    name: managerName, // provisions needed for taking in Manager's first and last names?
-    value: deptId, // does this need to be the id of the dept? i.e. the depts have id's managers do not
-  }));
+  const managers = await db.findAllEmployees();
+  const managerChoices = managers.map(
+    ({ id, first_name, last_name, manager_id }) => ({
+      name: `${first_name} ${last_name}`, // provisions needed for taking in Manager's first and last names?
+      value: id,
+    })
+  );
+
+  const managerCompare = managers.map(
+    ({ id, first_name, last_name, manager_id }) => ({
+      name: `${first_name} ${last_name}`, // provisions needed for taking in Manager's first and last names?
+      managerId: manager_id,
+      id,
+    })
+  );
+
   const { id } = await prompt([
     {
       type: "list",
@@ -115,10 +130,18 @@ async function viewAllEmployeesByManager() {
       choices: managerChoices,
     },
   ]);
-  const employees = await db.findAllEmployeesByManager(deptId);
+  const employees = managerCompare.filter((employee) => {
+    if (employee.managerId === id) {
+      return employee;
+    }
+  });
+  if (employees.length === 0) {
+    console.log("This employee is not a manager");
+  } else {
+    console.log("-".repeat(30));
+    console.table(employees);
+  } // repeating 30 dashes
   // console.log(employees);
-  console.log("-".repeat(30)); // repeating 30 dashes
-  console.table(employees); // display employees by dept. in a table
   mainPrompt();
 }
 
@@ -213,7 +236,7 @@ async function updateEmployeeRole() {
       choices: roleChoices,
     },
   ]);
-  await db.updateEmployeeRole(employee, role);
+  await db.updateEmployeeRole(employee, role); // can this be where the err is thrown?
   mainPrompt();
 }
 
@@ -246,6 +269,81 @@ async function addEmployeeRole() {
   await db.addEmployeeRole(deptId, newRole, newRoleSalary);
   mainPrompt(); // return to main prompt
 }
+
+async function addDepartment() {
+  const departments = await db.findAllDepts();
+  // console.log(departments);
+  const deptChoices = departments.map(({ id, dept_name }) => ({
+    name: dept_name,
+    value: id, // takes in the dept. id before displaying the associated employees
+  }));
+
+  const { deptId, newRole, newRoleSalary } = await prompt([
+    {
+      type: "list",
+      name: "deptId",
+      message: "Please select the department to which you wish to add a role:",
+      choices: deptChoices,
+    },
+    {
+      type: "input",
+      name: "newRole",
+      message: "What is the name of the new role?",
+    },
+    {
+      type: "input",
+      name: "newRoleSalary",
+      message: "What is the salary for the new role?",
+    },
+  ]);
+  await db.addDepartment(deptId, newRole, newRoleSalary);
+  mainPrompt(); // return to main prompt
+}
+
+// Below added to rearrange as removeEmployeeRole()
+// async function removeEmployeeRole() {
+//   const employees = await db.findAllEmployees();
+//   const employeeChoices = employees.map(({ id, first_name, last_name }) => ({
+//     name: `${first_name} ${last_name} `,
+//     value: id,
+//   }));
+//   const employee = await prompt([
+//     {
+//       type: "list",
+//       name: "toRemove",
+//       message: "Please select employee to remove:",
+//       choices: employeeChoices,
+//     },
+//   ]);
+//   await db.removeEmployee(employee.toRemove);
+//   console.log(employee);
+//   mainPrompt();
+//   //console.log(employeeChoices);
+// }
+
+// const roles = await db.findAllRoles();
+// const roleChoices = roles.map(({ id, title }) => ({
+//   name: `${title}`,
+//   value: id,
+// }));
+// const { employee, role } = await prompt([
+//   {
+//     type: "list",
+//     name: "employee",
+//     message: "Please select employee whose role you wish to update:",
+//     choices: employeeChoices,
+//   },
+//   {
+//     type: "list",
+//     name: "role",
+//     message: "Please select the role for the employee:",
+//     choices: roleChoices,
+//   },
+// ]);
+// await db.updateEmployeeRole(employee, role); // can this be where the err is thrown?
+// mainPrompt();
+
+// End removeEmployeesRole()
 
 // function updateEmployee() {
 //   console.log("Updating, last_name \n");

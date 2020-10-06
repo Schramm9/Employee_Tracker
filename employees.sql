@@ -26,22 +26,22 @@ use employees;
 INSERT INTO department
     (dept_name)
 VALUES
-    ('Sales'),
-    ('Engineering'),
-    ('Finance'),
-    ('Legal');
+    ('Sales (Dept. ID 1)'),
+    ('Engineering (Dept. ID 2)'),
+    ('Finance (Dept. ID 3)'),
+    ('Legal (Dept. ID 4)');
 
 INSERT INTO role
     (title, salary, department_id)
 VALUES
-    ('Sales Lead', 100000, 1),
-    ('Salesperson', 80000, 1),
-    ('Lead Engineer', 150000, 2),
-    ('Software Engineer', 120000, 2),
-    ('Account Manager', 160000, 3),
-    ('Accountant', 125000, 3),
-    ('Legal Team Lead', 250000, 4),
-    ('Lawyer', 190000, 4);
+    ('Sales Lead (role ID 1)', 100000, 1), -- role id 1
+    ('Salesperson (role ID 2)', 80000, 1), -- role id 2
+    ('Lead Engineer (role ID 3)', 150000, 2), -- role id 3
+    ('Software Engineer (role ID 4)', 120000, 2), -- role id 4
+    ('Account Manager (role ID 5)', 160000, 3), -- role id 5
+    ('Accountant (role ID 6)', 125000, 3), -- role id 6
+    ('Legal Team Lead (role ID 7)', 250000, 4), -- role id 7
+    ('Lawyer (role ID 8)', 190000, 4); -- role id 8
 
 INSERT INTO employee
     (first_name, last_name, role_id, manager_id)
