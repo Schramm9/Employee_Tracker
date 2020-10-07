@@ -1,4 +1,4 @@
-const connection = require("./connection");
+const connection = require("./connection"); // connection
 class Company {
   constructor(connection) {
     this.connection = connection;
@@ -45,6 +45,15 @@ class Company {
       "INSERT INTO role SET title = ?, department_id = ?, salary = ?",
       [newRole, deptId, newRoleSalary]
     );
+  }
+  addDepartment(department) {
+    return this.connection.query(
+      "INSERT INTO department SET dept_name = ?",
+      department
+    );
+  }
+  removeRole(id) {
+    return this.connection.query("DELETE FROM role WHERE id = ?", id);
   }
 }
 

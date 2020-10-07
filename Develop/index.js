@@ -20,14 +20,15 @@ async function mainPrompt() {
         message: "What would you like to do?",
         choices: [
           "View All Employees", // return the db
+          "View All Departments",
           "View All Employees by department",
           "View All Employees by manager",
           "Add Employee",
           "Remove Employee",
           "Update Employee Role",
           "Add Employee Role",
+          "Add Department",
           "Remove Employee Role",
-          "Update Employee Manager",
           "View All Roles",
           "Quit Application",
         ],
@@ -40,6 +41,9 @@ async function mainPrompt() {
       break;
     case "View All Employees by department":
       viewAllEmployeesByDept();
+      break;
+    case "View All Departments":
+      viewAllDepartments();
       break;
     case "View All Employees by manager":
       viewAllEmployeesByManager(); // Needs work- can it be recalibrated to throw an err. ?
@@ -56,14 +60,11 @@ async function mainPrompt() {
     case "Add Employee Role":
       addEmployeeRole();
       break;
-    case "Add department":
-      addDepartment();
+    case "Add Department":
+      addDepartment(); // creating...
       break;
     case "Remove Employee Role":
       removeEmployeeRole(); // Needs to be started
-      break;
-    case "Update Employee Manager":
-      updateEmployeeManager(); // Needs to be started
       break;
     case "View All Roles":
       viewAllRoles(); // Needs to be started
@@ -80,6 +81,13 @@ async function viewAllEmployees() {
   const employees = await db.findAllEmployees();
   console.log("-".repeat(30)); // repeating 30 dashes
   console.table(employees); // display employees in a table
+  mainPrompt();
+}
+
+async function viewAllDepartments() {
+  const departments = await db.findAllDepts();
+  console.log("-".repeat(30)); // repeating 30 dashes
+  console.table(departments); // display departments in a table
   mainPrompt();
 }
 
@@ -236,7 +244,7 @@ async function updateEmployeeRole() {
       choices: roleChoices,
     },
   ]);
-  await db.updateEmployeeRole(employee, role); // can this be where the err is thrown?
+  await db.updateEmployeeRole(employee, role);
   mainPrompt();
 }
 
@@ -271,34 +279,51 @@ async function addEmployeeRole() {
 }
 
 async function addDepartment() {
-  const departments = await db.findAllDepts();
-  // console.log(departments);
-  const deptChoices = departments.map(({ id, dept_name }) => ({
-    name: dept_name,
-    value: id, // takes in the dept. id before displaying the associated employees
-  }));
-
-  const { deptId, newRole, newRoleSalary } = await prompt([
-    {
-      type: "list",
-      name: "deptId",
-      message: "Please select the department to which you wish to add a role:",
-      choices: deptChoices,
-    },
+  const { deptAdded } = await prompt([
     {
       type: "input",
-      name: "newRole",
-      message: "What is the name of the new role?",
-    },
-    {
-      type: "input",
-      name: "newRoleSalary",
-      message: "What is the salary for the new role?",
+      name: "deptAdded",
+      message: "Please enter the name of the department being added:",
     },
   ]);
-  await db.addDepartment(deptId, newRole, newRoleSalary);
+  await db.addDepartment(deptAdded);
   mainPrompt(); // return to main prompt
 }
+
+async function removeEmployeeRole() {
+  const roles = await db.findAllRoles();
+  const roleChoices = roles.map(({ id, title }) => ({
+    name: `${title}`,
+    value: id,
+  }));
+
+  const role = await prompt([
+    {
+      type: "list",
+      name: "toRemove",
+      message: "Please select the role to remove:",
+      choices: roleChoices,
+    },
+  ]);
+  await db.removeRole(role.toRemove);
+  console.log(`This role has been removed.`);
+  mainPrompt();
+}
+
+async function viewAllRoles() {
+  const roles = await db.findAllRoles();
+  console.log("-".repeat(30)); // repeating 30 dashes
+  console.table(roles); // display employees in a table
+  mainPrompt();
+}
+
+// Tables:
+// department
+//      id, dept_name
+// employee
+//      id, first_name, last_name, role_id, manager_id
+// role
+//      id, title, salary, department_id
 
 // Below added to rearrange as removeEmployeeRole()
 // async function removeEmployeeRole() {
