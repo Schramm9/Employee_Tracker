@@ -23,13 +23,14 @@ async function mainPrompt() {
           "View All Departments",
           "View All Employees by department",
           "View All Employees by manager",
+          "View All Roles",
           "Add Employee",
-          "Remove Employee",
-          "Update Employee Role",
           "Add Employee Role",
           "Add Department",
+          "Remove Employee",
+          "Remove Department",
           "Remove Employee Role",
-          "View All Roles",
+          "Update Employee Role",
           "Quit Application",
         ],
       },
@@ -37,7 +38,7 @@ async function mainPrompt() {
   );
   switch (mainMenu) {
     case "View All Employees":
-      viewAllEmployees(); // Needs to show all fields like the gif
+      viewAllEmployees();
       break;
     case "View All Employees by department":
       viewAllEmployeesByDept();
@@ -46,7 +47,7 @@ async function mainPrompt() {
       viewAllDepartments();
       break;
     case "View All Employees by manager":
-      viewAllEmployeesByManager(); // Needs work- can it be recalibrated to throw an err. ?
+      viewAllEmployeesByManager();
       break; //
     case "Add Employee": // id added on its own i.e. auto_increment
       addEmployee();
@@ -61,13 +62,16 @@ async function mainPrompt() {
       addEmployeeRole();
       break;
     case "Add Department":
-      addDepartment(); // creating...
+      addDepartment();
+      break;
+    case "Remove Department":
+      removeDepartment();
       break;
     case "Remove Employee Role":
-      removeEmployeeRole(); // Needs to be started
+      removeEmployeeRole();
       break;
     case "View All Roles":
-      viewAllRoles(); // Needs to be started
+      viewAllRoles();
       break;
     default:
       process.exit();
@@ -117,14 +121,14 @@ async function viewAllEmployeesByManager() {
   const managers = await db.findAllEmployees();
   const managerChoices = managers.map(
     ({ id, first_name, last_name, manager_id }) => ({
-      name: `${first_name} ${last_name}`, // provisions needed for taking in Manager's first and last names?
+      name: `${first_name} ${last_name}`,
       value: id,
     })
   );
 
   const managerCompare = managers.map(
     ({ id, first_name, last_name, manager_id }) => ({
-      name: `${first_name} ${last_name}`, // provisions needed for taking in Manager's first and last names?
+      name: `${first_name} ${last_name}`,
       managerId: manager_id,
       id,
     })
@@ -288,6 +292,28 @@ async function addDepartment() {
   ]);
   await db.addDepartment(deptAdded);
   mainPrompt(); // return to main prompt
+}
+
+async function removeDepartment() {
+  const departments = await db.findAllDepts();
+  // console.log(departments);
+  const deptChoices = departments.map(({ id, dept_name }) => ({
+    name: dept_name,
+    value: id, // takes in the dept. id before displaying the associated employees
+  }));
+
+  const department = await prompt([
+    {
+      type: "list",
+      name: "toRemove",
+      message: "Please select the department you wish to remove",
+      choices: deptChoices,
+    },
+  ]);
+
+  await db.removeDepartment(department.toRemove);
+  mainPrompt();
+  //console.log(employeeChoices);
 }
 
 async function removeEmployeeRole() {

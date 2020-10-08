@@ -6,7 +6,7 @@ class Company {
   findAllEmployees() {
     return this.connection.query(
       "SELECT employee.id, employee.first_name, employee.last_name, employee.manager_id FROM employee;"
-    );
+    ); // make employee's role show by
   }
   findAllDepts() {
     return this.connection.query(
@@ -16,12 +16,12 @@ class Company {
   findAllEmployeesByDept(deptId) {
     return this.connection.query(
       "SELECT employee.first_name, employee.last_name, employee.role_id FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on department.id = role.department_id WHERE department.id = ?;",
-      deptId
+      deptId // asks for department to view, then shows first_name last_name role_id
     );
   }
   findAllEmployeesByManager(deptId) {
     return this.connection.query(
-      "SELECT employee.first_name, employee.last_name, employee.role_id F ROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on department.id = role.department_id WHERE department.id = ?;",
+      "SELECT employee.first_name, employee.last_name, employee.role_id FROM employee LEFT JOIN role on employee.role_id = role.id LEFT JOIN department on department.id = role.department_id WHERE department.id = ?;",
       deptId
     );
   }
@@ -49,6 +49,12 @@ class Company {
   addDepartment(department) {
     return this.connection.query(
       "INSERT INTO department SET dept_name = ?",
+      department
+    );
+  }
+  removeDepartment(department) {
+    return this.connection.query(
+      "DELETE FROM department WHERE id = ?",
       department
     );
   }
